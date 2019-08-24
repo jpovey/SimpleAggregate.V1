@@ -2,8 +2,7 @@
 {
     using SimpleAggregate.Domain;
 
-    internal class DeliveryCancelled : IEvent
+    internal class UnregisteredEvent : IEvent
     {
-
     }
 }

@@ -4,53 +4,32 @@
 
     internal class Parcel : Aggregate
     {
-        private bool _delivered;
-        private bool _cancelled;
-        private string _deliveredBy;
-        private string _deliveryAddress;
+        public bool Delivered { get; private set; }
+        public string DeliveredBy { get; private set; }
 
         public Parcel()
         {
-            RegisterEvents();
+            RegisterEventHandlers();
         }
 
-        internal void SetDeliveryAddress(string address)
+        internal void DeliverParcel(string deliveredBy)
         {
-            this.Apply(new DeliveryAddressSet
+            this.Apply(new ParcelDelivered
             {
-                Address = address
+                DeliveredBy = deliveredBy
             });
         }
 
-        internal void CancelDelivery(string address)
+        private void Handle(ParcelDelivered parcelDelivered)
         {
-            if (!_delivered)
-            {
-                this.Apply(new DeliveryCancelled());
-            }
+            DeliveredBy = parcelDelivered.DeliveredBy;
+            Delivered = true;
         }
 
-        private void Apply(ParcelDelivered parcelDelivered)
-        {
-            _delivered = true;
-            _deliveredBy = parcelDelivered.DeliveredBy;
-        }
 
-        private void Apply(DeliveryAddressSet deliveryAddressSet)
+        private void RegisterEventHandlers()
         {
-            _deliveryAddress = deliveryAddressSet.Address;
-        }
-
-        private void Apply(DeliveryCancelled deliveryCancelled)
-        {
-            _cancelled = true;
-        }
-
-        private void RegisterEvents()
-        {
-           // this.RegisterEvent<DeliveryAddressSet>(this.Apply);
-           // this.RegisterEvent<ParcelDelivered>(this.Apply);
-           // this.RegisterEvent<DeliveryCancelled>(this.Apply);
+           this.RegisterEvent<ParcelDelivered>(Handle);
         }
     }
 }
