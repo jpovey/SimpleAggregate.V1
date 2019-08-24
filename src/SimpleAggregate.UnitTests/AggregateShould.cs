@@ -85,7 +85,7 @@
         }
 
         [Test]
-        public void ThrowException_WhenApplyingEvent_GivenEventNotRegistered()
+        public void ThrowException_WhenEventNotRegistered_GivenIgnoreUnregisteredEventsIsFalse()
         {
             var events = new List<IEvent>()
             {
@@ -95,6 +95,20 @@
             Action act = () => _sut.Rehydrate(events);
 
             act.Should().Throw<UnregisteredEventException>();
+        }
+
+        [Test]
+        public void NotThrowException_WhenEventNotRegistered_GivenIgnoreUnregisteredEventsIsTrue()
+        {
+            _sut.IgnoreUnregisteredEvents();
+            var events = new List<IEvent>()
+            {
+                new UnregisteredEvent()
+            };
+
+            Action act = () => _sut.Rehydrate(events);
+
+            act.Should().NotThrow<UnregisteredEventException>();
         }
     }
 }

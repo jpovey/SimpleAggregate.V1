@@ -8,6 +8,7 @@
     {
         private readonly Dictionary<Type, Action<IEvent>> _registeredEvents = new Dictionary<Type, Action<IEvent>>();
         public readonly List<IEvent> UncommittedEvents = new List<IEvent>();
+        protected bool IgnoreUnregisteredEvents;
 
         protected void RegisterEvent<TEvent>(Action<TEvent> eventHandler) where TEvent : class
         {
@@ -23,10 +24,12 @@
         private void ApplyEvent(IEvent @event)
         {
             var eventType = @event.GetType();
-            if (!_registeredEvents.TryGetValue(eventType, out var eventHandler))
+            _registeredEvents.TryGetValue(eventType, out var eventHandler);
+
+            if (!IgnoreUnregisteredEvents && eventHandler == null)
                 throw new UnregisteredEventException($"The requested event '{eventType.FullName}' is not registered in '{GetType().FullName}'");
 
-            eventHandler(@event);
+            eventHandler?.Invoke(@event);
         }
 
         public void Rehydrate(IEnumerable<IEvent> history)

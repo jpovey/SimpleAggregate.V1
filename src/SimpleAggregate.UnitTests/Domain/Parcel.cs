@@ -12,12 +12,14 @@
             RegisterEventHandlers();
         }
 
+        internal new void IgnoreUnregisteredEvents()
+        {
+            base.IgnoreUnregisteredEvents = true;
+        }
+
         internal void DeliverParcel(string deliveredBy)
         {
-            this.Apply(new ParcelDelivered
-            {
-                DeliveredBy = deliveredBy
-            });
+            this.Apply(new ParcelDelivered { DeliveredBy = deliveredBy });
         }
 
         private void Handle(ParcelDelivered parcelDelivered)
@@ -25,7 +27,6 @@
             DeliveredBy = parcelDelivered.DeliveredBy;
             Delivered = true;
         }
-
 
         private void RegisterEventHandlers()
         {
