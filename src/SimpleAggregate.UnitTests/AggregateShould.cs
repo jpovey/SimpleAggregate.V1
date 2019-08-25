@@ -110,5 +110,13 @@
 
             act.Should().NotThrow<UnregisteredEventException>();
         }
+
+        [Test]
+        public void ThrowException_WhenApplyingNullEvent()
+        {
+            Action act = () => _sut.ApplyNullEvent();
+
+            act.Should().Throw<ArgumentNullException>();
+        }
     }
 }

@@ -21,7 +21,12 @@
         {
             this.Apply(new ParcelDelivered { DeliveredBy = deliveredBy });
         }
-        
+
+        internal void ApplyNullEvent()
+        {
+            this.Apply(null);
+        }
+
         private void Handle(ParcelDelivered parcelDelivered)
         {
             DeliveredBy = parcelDelivered.DeliveredBy;

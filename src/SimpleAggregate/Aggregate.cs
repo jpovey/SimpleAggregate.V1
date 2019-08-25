@@ -22,6 +22,8 @@
 
         private void ApplyEvent(object @event)
         {
+            if (@event == null) throw new ArgumentNullException(nameof(@event), "The event to be applied is null");
+
             var eventType = @event.GetType();
             _registeredEvents.TryGetValue(eventType, out var eventHandler);
 
