@@ -1,4 +1,4 @@
-﻿namespace SimpleAggregate.UnitTests.Domain
+﻿namespace SimpleAggregate.UnitTests.Domain.Parcel
 {
     using Events;
 
@@ -21,7 +21,7 @@
         {
             this.Apply(new ParcelDelivered { DeliveredBy = deliveredBy });
         }
-
+        
         private void Handle(ParcelDelivered parcelDelivered)
         {
             DeliveredBy = parcelDelivered.DeliveredBy;

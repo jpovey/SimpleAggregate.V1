@@ -4,10 +4,10 @@
     using System.Collections.Generic;
     using AutoFixture;
     using Domain;
-    using Domain.Events;
+    using Domain.Parcel;
+    using Domain.Parcel.Events;
     using FluentAssertions;
     using NUnit.Framework;
-    using SimpleAggregate.Domain;
 
     [TestFixture]
     public class AggregateShould

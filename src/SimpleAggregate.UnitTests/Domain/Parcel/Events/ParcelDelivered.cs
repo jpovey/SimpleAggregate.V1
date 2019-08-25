@@ -1,7 +1,5 @@
-﻿namespace SimpleAggregate.UnitTests.Domain.Events
+﻿namespace SimpleAggregate.UnitTests.Domain.Parcel.Events
 {
-    using SimpleAggregate.Domain;
-
     internal class ParcelDelivered : IEvent
     {
         internal string DeliveredBy;

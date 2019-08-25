@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleAggregate.Domain\SimpleAggregate.Domain.csproj" />
     <ProjectReference Include="..\SimpleAggregate\SimpleAggregate.csproj" />
   </ItemGroup>
 
