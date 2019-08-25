@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Jonathan Povey</Authors>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/jpovey/SimpleAggregate/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jpovey/SimpleAggregate</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jpovey/SimpleAggregate</RepositoryUrl>
+    <PackageTags>SimpleAggregate DDD Aggregate</PackageTags>
+    <Description>Simple Aggregate. A package to help simplify applying events to a DDD aggregate.
+</Description>
   </PropertyGroup>
 
 </Project>
