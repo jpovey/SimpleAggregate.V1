@@ -68,7 +68,7 @@
                 new SavingsAccountCreated(_accountId, SavingsTarget)
             };
 
-            _sut.Rehydrate(events);
+            _sut.Hydrate(events);
 
             _sut.AccountId.Should().Be(_accountId);
             _sut.SavingsTarget.Should().Be(SavingsTarget);
@@ -83,7 +83,7 @@
                 new SavingsAccountCreated(_accountId, SavingsTarget)
             };
 
-            _sut.Rehydrate(events);
+            _sut.Hydrate(events);
 
             _sut.HydratedEventCount.Should().Be(1);
         }
@@ -96,7 +96,7 @@
                 new SavingsAccountCreated(_accountId, SavingsTarget)
             };
 
-            _sut.Rehydrate(events);
+            _sut.Hydrate(events);
 
             _sut.UncommittedEvents.Count.Should().Be(0);
         }
@@ -109,7 +109,7 @@
                 new UnregisteredEvent()
             };
 
-            Action act = () => _sut.Rehydrate(events);
+            Action act = () => _sut.Hydrate(events);
 
             act.Should().Throw<UnregisteredEventException>();
         }
@@ -123,7 +123,7 @@
                 new UnregisteredEvent()
             };
 
-            Action act = () => _sut.Rehydrate(events);
+            Action act = () => _sut.Hydrate(events);
 
             act.Should().NotThrow<UnregisteredEventException>();
         }

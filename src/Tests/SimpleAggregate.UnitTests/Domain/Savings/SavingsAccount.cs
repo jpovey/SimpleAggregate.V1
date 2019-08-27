@@ -2,7 +2,7 @@
 {
     using Events;
 
-    internal class SavingsAccount : Aggregate
+    internal class SavingsAccount : AggregateBase
     {
         public override string AggregateId => AccountId;
         public string AccountId { get; private set; }
@@ -35,13 +35,13 @@
             this.Apply(null);
         }
 
-        public void Handle(SavingsAccountCreated savingsAccountCreated)
+        private void Handle(SavingsAccountCreated savingsAccountCreated)
         {
             AccountId = savingsAccountCreated.AccountId;
             SavingsTarget = savingsAccountCreated.SavingsTarget;
         }
 
-        public void Handle(SavingsAdded savingsAdded)
+        private void Handle(SavingsAdded savingsAdded)
         {
             SavingsAmount += savingsAdded.AmountAdded;
             if (SavingsAmount > SavingsTarget)
@@ -50,16 +50,16 @@
             }
         }
 
-        public void Handle(SavingsTargetMet savingsTargetMet)
+        private void Handle(SavingsTargetMet savingsTargetMet)
         {
             SavingsTargetMet = true;
         }
 
         private void RegisterEventHandlers()
         {
-            this.RegisterEvent<SavingsAccountCreated>(Handle);
-            this.RegisterEvent<SavingsAdded>(Handle);
-            this.RegisterEvent<SavingsTargetMet>(Handle);
+            this.RegisterEventHandler<SavingsAccountCreated>(Handle);
+            this.RegisterEventHandler<SavingsAdded>(Handle);
+            this.RegisterEventHandler<SavingsTargetMet>(Handle);
         }
     }
 }
