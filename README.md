@@ -46,14 +46,26 @@ account.Hydrate(events);
 ```
 
 ## Aggregate Repository
-The aggregate repository can be used to load an aggregate from an injected event source such as cosmosDb. The IEventSource should be used to wrap the internal data access implementation.
+The aggregate repository can be used to load an aggregate from an injected event source such as cosmosDb. The AggregateRepository requires an instance of IEventSource which is used to wrap the event store data access implementation.
+
+This class could be used in a command handler to perform some business logic against an aggregate.
 
 ```c#
-var eventSource = new EventSource(); //IEventSource wrapper
-var repository = new AggregateRepository(eventSource);
+public class AccountHandler 
+{
+    private readonly AggregateRepository _repository;
 
-var accountId = "1234";
-var aggregate = await repository.GetAggregate<SavingsAccount>(accountId);
-aggregate.AddSavings(50);
-repository.Save(aggregate)
+    public AccountHandler(AggregateRepository repository) 
+    {
+        _repository = repository
+    }
+
+    public void Handle(AddSavingsCommand command) 
+    {
+        var aggregate = await _repository.GetAggregate<SavingsAccount>(command.accountId);
+        aggregate.AddSavings(command.Amount);
+        _repository.Save(aggregate)
+    }
+}
+
 ```
