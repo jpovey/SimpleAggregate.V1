@@ -2,11 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
     public abstract class Aggregate
     {
+        public ReadOnlyCollection<object> UncommittedEvents => _uncommittedEvents.AsReadOnly();
+
+        private readonly List<object> _uncommittedEvents = new List<object>();
         private readonly Dictionary<Type, Action<object>> _registeredEvents = new Dictionary<Type, Action<object>>();
-        public readonly List<object> UncommittedEvents = new List<object>();
         protected bool IgnoreUnregisteredEvents;
 
         protected void RegisterEvent<TEvent>(Action<TEvent> eventHandler) where TEvent : class
@@ -17,7 +20,7 @@
         protected void Apply(object @event)
         {
             this.ApplyEvent(@event);
-            UncommittedEvents.Add(@event);
+            _uncommittedEvents.Add(@event);
         }
 
         private void ApplyEvent(object @event)
@@ -40,7 +43,7 @@
 
         public void ClearUncommittedEvents()
         {
-            UncommittedEvents.Clear();
+            _uncommittedEvents.Clear();
         }
     }
 }
