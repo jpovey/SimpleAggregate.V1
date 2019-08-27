@@ -2,10 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using AutoFixture;
-    using Domain;
-    using Domain.Parcel;
-    using Domain.Parcel.Events;
+    using Domain.Savings;
+    using Domain.Savings.Events;
     using FluentAssertions;
     using NUnit.Framework;
 
@@ -13,26 +13,30 @@
     public class AggregateShould
     {
         private readonly Fixture _fixture = new Fixture();
-        private Parcel _sut = new Parcel();
+        private SavingsAccount _sut;
+        private string _accountId;
+        private const int SavingsTarget = 500;
 
         [SetUp]
         public void Setup()
         {
-            _sut = new Parcel();
+            _sut = new SavingsAccount();
+            _accountId = _fixture.Create<string>();
         }
 
         [Test]
         public void AddEventToUncommittedEvents_WhenApplying()
         {
-            _sut.DeliverParcel("Mr Delivery Driver");
+            _sut.CreateSavingsAccount(_accountId, SavingsTarget);
 
             _sut.UncommittedEvents.Count.Should().Be(1);
+            _sut.UncommittedEvents.First().Should().BeEquivalentTo(new SavingsAccountCreated(_accountId, SavingsTarget));
         }
 
         [Test]
         public void ClearUncommittedEvents()
         {
-            _sut.DeliverParcel("Mr Delivery Driver");
+            _sut.CreateSavingsAccount(_accountId, SavingsTarget);
 
             _sut.ClearUncommittedEvents();
 
@@ -42,41 +46,54 @@
         [Test]
         public void ApplyEvent()
         {
-            var deliveredBy = _fixture.Create<string>();
+            _sut.CreateSavingsAccount(_accountId, SavingsTarget);
 
-            _sut.DeliverParcel(deliveredBy);
+            _sut.AccountId.Should().Be(_accountId);
+            _sut.SavingsTarget.Should().Be(SavingsTarget);
+        }
 
-            _sut.DeliveredBy.Should().Be(deliveredBy);
-            _sut.Delivered.Should().BeTrue();
+        [Test]
+        public void SetAggregateId()
+        {
+            _sut.CreateSavingsAccount(_accountId, SavingsTarget);
+
+            _sut.AggregateId.Should().Be(_accountId);
         }
 
         [Test]
         public void RehydrateAggregate()
         {
-            var deliveredBy = _fixture.Create<string>();
-            var events = new List<IEvent>()
+            var events = new List<object>
             {
-                new ParcelDelivered
-                {
-                    DeliveredBy = deliveredBy
-                }
+                new SavingsAccountCreated(_accountId, SavingsTarget)
             };
 
             _sut.Rehydrate(events);
 
-            _sut.DeliveredBy.Should().Be(deliveredBy);
+            _sut.AccountId.Should().Be(_accountId);
+            _sut.SavingsTarget.Should().Be(SavingsTarget);
+            _sut.HydratedEventCount.Should().Be(1);
+        }
+
+        [Test]
+        public void IncrementHydratedEventCount_WhenRehydrateAggregate()
+        {
+            var events = new List<object>
+            {
+                new SavingsAccountCreated(_accountId, SavingsTarget)
+            };
+
+            _sut.Rehydrate(events);
+
+            _sut.HydratedEventCount.Should().Be(1);
         }
 
         [Test]
         public void NotAddHydratedEventsToUncommittedEvents_WhenHydratingAggregate()
         {
-            var deliveredBy = _fixture.Create<string>();
-            var events = new List<IEvent>()
+            var events = new List<object>
             {
-                new ParcelDelivered
-                {
-                    DeliveredBy = deliveredBy
-                }
+                new SavingsAccountCreated(_accountId, SavingsTarget)
             };
 
             _sut.Rehydrate(events);
@@ -87,7 +104,7 @@
         [Test]
         public void ThrowException_WhenEventNotRegistered_GivenIgnoreUnregisteredEventsIsFalse()
         {
-            var events = new List<IEvent>()
+            var events = new List<object>
             {
                 new UnregisteredEvent()
             };
@@ -101,7 +118,7 @@
         public void NotThrowException_WhenEventNotRegistered_GivenIgnoreUnregisteredEventsIsTrue()
         {
             _sut.IgnoreUnregisteredEvents();
-            var events = new List<IEvent>()
+            var events = new List<object>
             {
                 new UnregisteredEvent()
             };
@@ -117,6 +134,28 @@
             Action act = () => _sut.ApplyNullEvent();
 
             act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Test]
+        public void AddUncommittedEventsInOrder()
+        {
+            const int savingsTarget = 100;
+            _sut.CreateSavingsAccount(_accountId, savingsTarget);
+
+            _sut.AddSavings(50);
+            _sut.SavingsTargetMet.Should().BeFalse();
+
+            _sut.AddSavings(40);
+            _sut.SavingsTargetMet.Should().BeFalse();
+
+            _sut.AddSavings(20);
+            _sut.SavingsTargetMet.Should().BeTrue();
+
+            _sut.UncommittedEvents[0].Should().BeEquivalentTo(new SavingsAccountCreated(_accountId, savingsTarget));
+            _sut.UncommittedEvents[1].Should().BeEquivalentTo(new SavingsAdded(50));
+            _sut.UncommittedEvents[2].Should().BeEquivalentTo(new SavingsAdded(40));
+            _sut.UncommittedEvents[3].Should().BeEquivalentTo(new SavingsAdded(20));
+            _sut.UncommittedEvents[4].Should().BeEquivalentTo(new SavingsTargetMet(110));
         }
     }
 }
