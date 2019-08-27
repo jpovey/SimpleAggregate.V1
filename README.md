@@ -11,6 +11,9 @@ A package to help simplify applying events to a DDD aggregate.
 // Step 1
 public class SavingsAccount : AggregateBase 
 {
+    public string AccountId { get; private set; }
+    public int SavingsTarget { get; private set; }
+
     public SavingsAccount()
     {
         // Step 3
