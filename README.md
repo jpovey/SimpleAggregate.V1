@@ -1,4 +1,9 @@
-# SimpleAggregate
+## SimpleAggregate has moved
+For a more robust and elegant solution see https://github.com/jpovey/SimpleAggregate
+
+
+
+# SimpleAggregate V1
 A package to help simplify applying events to a DDD aggregate.
 
 # How to use
